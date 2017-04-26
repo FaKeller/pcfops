@@ -1,0 +1,66 @@
+meta:
+  stage:
+    name: (( grab "The name of the stage" ))
+    previous-job: (( grab "The names of the previous jobs required to be passed for this stage to run" ))
+
+    # Credentials for Operations Manager. These are used for uploading, staging,
+    # and deploying the product file on Operations Manager.
+    opsman:
+      uri: (( param "Ops Manager URI to connect to" ))
+      admin-username: (( param "Ops Manager admin username" ))
+      admin-password: (( param "Ops Manager admin password" ))
+      timeout-seconds: (( param "Ops Manager timeout" ))
+
+    # The IaaS name for which stemcell to download. See
+    # https://github.com/pivotal-cf/pcf-product-stemcell-downloader/ for the list of
+    # allowed IaaS names.
+    iaas-type: (( param "The IAAS type. E.g. 'vsphere'" ))
+
+
+jobs:
+- (( append ))
+- name: (( concat "upgrade-tile-" meta.stage.name ))
+  plan:
+  - aggregate:
+    - get: pivnet-product
+      resource: (( grab meta.product.name ))
+      passed: [ (( grab meta.stage.previous-job )) ]
+    - get: pcf-pipelines
+    - get: tool-om
+    - get: stemcell-downloader
+  - task: wait-opsman-clear
+    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+    params:
+      OPSMAN_USERNAME: (( grab meta.stage.opsman.admin-username ))
+      OPSMAN_PASSWORD: (( grab meta.stage.opsman.admin-password ))
+      OPSMAN_URI: (( grab meta.stage.opsman.uri ))
+
+  - task: upload-tile
+    file: pcf-pipelines/tasks/upload-product/task.yml
+    params:
+      OPSMAN_USERNAME: (( grab meta.stage.opsman.admin-username ))
+      OPSMAN_PASSWORD: (( grab meta.stage.opsman.admin-password ))
+      OPSMAN_URI: (( grab meta.stage.opsman.uri ))
+      PIVNET_PRODUCT_NAME: (( grab meta.product.slug ))
+  - task: stage-tile
+    file: pcf-pipelines/tasks/stage-product/task.yml
+    params:
+      OPSMAN_USERNAME: (( grab meta.stage.opsman.admin-username ))
+      OPSMAN_PASSWORD: (( grab meta.stage.opsman.admin-password ))
+      OPSMAN_URI: (( grab meta.stage.opsman.uri ))
+      PRODUCT_NAME: (( grab meta.product.tile-name ))
+  - task: upload-stemcell
+    file: pcf-pipelines/tasks/upload-stemcell/task.yml
+    params:
+      PRODUCT: (( grab meta.product.metadata_basename ))
+      IAAS_TYPE: (( grab meta.stage.iaas-type ))
+      OPSMAN_USERNAME: (( grab meta.stage.opsman.admin-username ))
+      OPSMAN_PASSWORD: (( grab meta.stage.opsman.admin-password ))
+      OPSMAN_URI: (( grab meta.stage.opsman.uri ))
+  - task: apply-changes
+    file: pcf-pipelines/tasks/apply-changes/task.yml
+    params:
+      OPSMAN_USERNAME: (( grab meta.stage.opsman.admin-username ))
+      OPSMAN_PASSWORD: (( grab meta.stage.opsman.admin-password ))
+      OPSMAN_URI: (( grab meta.stage.opsman.uri ))
+      OPSMAN_TIMEOUT: (( grab meta.stage.opsman.timeout-seconds ))
