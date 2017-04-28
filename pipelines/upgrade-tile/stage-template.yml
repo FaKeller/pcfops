@@ -26,8 +26,11 @@ jobs:
       resource: (( grab meta.product.name ))
       passed: [ (( grab meta.stage.previous-job )) ]
     - get: pcf-pipelines
+      passed: [ (( grab meta.stage.previous-job )) ]
     - get: tool-om
+      passed: [ (( grab meta.stage.previous-job )) ]
     - get: stemcell-downloader
+      passed: [ (( grab meta.stage.previous-job )) ]
   - task: wait-opsman-clear
     file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
     params:

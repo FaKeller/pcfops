@@ -1,0 +1,6 @@
+meta:
+  product:
+    name: mysql
+    metadata_basename: p_mysql
+    slug: p-mysql
+    tile-name: p-mysql

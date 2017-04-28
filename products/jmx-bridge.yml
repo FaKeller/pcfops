@@ -1,0 +1,6 @@
+meta:
+  product:
+    name: jmx-bridge
+    metadata_basename: p_metrics
+    slug: ops-metrics
+    tile-name: p-metrics
