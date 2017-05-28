@@ -1,0 +1,30 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cloudfoundry/cflinuxfs2
+
+inputs:
+- name: credentials
+- name: config
+
+params:
+  # the comma-separated stages to create, .e.g. "dev,qa,prod"
+  STAGES:
+  # the product pipelines to create, e.g. "er,mysql,rabbitmq"
+  PRODUCTS:
+
+  # relative path to config files in config resource
+  CONFIG_PATH_PREFIX: /
+  # relative path to credentials files in credentials resource
+  CREDENTIALS_PATH_PREFIX: /
+
+  ATC_EXTERNAL_URL:
+  ATC_BASIC_AUTH_USERNAME:
+  ATC_BASIC_AUTH_PASSWORD:
+  ATC_TEAM_NAME:
+
+run:
+  path: pcfops/tasks/update_pipeline.sh
