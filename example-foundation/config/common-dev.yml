@@ -1,0 +1,11 @@
+meta:
+  common:
+    pivnet:
+      poll-interval: 1h
+
+  stage:
+    opsman:
+      uri: https://test-ops-manager.local
+      admin-username: admin-test
+      timeout-seconds: 600
+    iaas-type: vsphere

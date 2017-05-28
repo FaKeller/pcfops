@@ -1,0 +1,51 @@
+# This pipeline deploys all pcfops related pipelines to a concourse team
+
+resources:
+
+# we want pcfops to configure all required pipelines
+- name: pcfops
+  type: git
+  source:
+    uri: https://github.com/FaKeller/pcfops.git
+    branch: master
+
+# we expect the general config for pcfops to be available in this resource
+- name: config
+  type: git
+  source:
+    uri: https://github.com/FaKeller/pcfops.git
+    branch: master
+
+# currently, credentials are expected to be stored in a separate resource.
+# note: this will be replaced by a proper credential solution after this issue is resolved:
+#   https://github.com/concourse/concourse/issues/291
+- name: credentials
+  type: git
+  source:
+    uri: https://github.com/FaKeller/pcfops.git
+    branch: master
+
+jobs:
+- name: configure-pipelines
+  plan:
+  - aggregate:
+    - get: pcfops
+      trigger: true
+    - get: config
+      trigger: true
+    - get: credentials
+        trigger: true
+  - task: update-all-pipelines
+    file: pcfops/tasks/update_pipeline.yml
+    params:
+      STAGES: dev,prod
+      PRODUCTS: er,mysql,jmx-bridge
+      CONFIG_PATH_PREFIX: example-foundation/config/
+      CREDENTIALS_PATH_PREFIX: example-foundation/credentials/
+      <<: *update_pipeline_common
+
+update_pipeline_common: &update_pipeline_common
+  ATC_EXTERNAL_URL: {{atc_external_url}}
+  ATC_BASIC_AUTH_USERNAME: {{atc_basic_auth_username}}
+  ATC_BASIC_AUTH_PASSWORD: {{atc_basic_auth_password}}
+  ATC_TEAM_NAME: {{atc_team_name}}
