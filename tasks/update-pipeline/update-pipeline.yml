@@ -27,4 +27,4 @@ params:
   ATC_TEAM_NAME:
 
 run:
-  path: pcfops/tasks/update_pipeline.sh
+  path: pcfops/tasks/update-pipeline.sh

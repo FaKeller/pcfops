@@ -36,7 +36,7 @@ jobs:
     - get: credentials
         trigger: true
   - task: update-all-pipelines
-    file: pcfops/tasks/update_pipeline.yml
+    file: pcfops/tasks/update-pipeline/update-pipeline.yml
     params:
       STAGES: dev,prod
       PRODUCTS: er,mysql,jmx-bridge
