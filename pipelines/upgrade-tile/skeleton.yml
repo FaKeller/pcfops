@@ -20,19 +20,19 @@ meta:
       # The token used to download the product file from Pivotal Network. Find this
       # on your Pivotal Network profile page:
       # https://network.pivotal.io/users/dashboard/edit-profile
-      token: (( param "Token to access Pivotal network API" ))
+      token: #(( param "Token to access Pivotal network API" ))
       # The interval to check Pivotal Network for updates to the product file.
-      poll-interval: (( param "Interval in seconds to poll Pivotal network" ))
+      poll-interval: #(( param "Interval in seconds to poll Pivotal network" ))
 
     github:
       # The token used to download the stemcell downloader from GitHub.
-      token: (( param "GitHub API access token" ))
+      token: #(( param "GitHub API access token" ))
 
   product:
     # The name of the resource to be displayed in the pipeline, e.g. 'rabbitmq'
-    name: (( param "Name of the product to be installed used throughout the pipeline" ))
+    name: #(( param "Name of the product to be installed used throughout the pipeline" ))
     # The minor product version to track, as a regexp. To track 1.7 of a product, this would be '1.7.*'
-    version: (( param "Version of the product to install. Use an asterisk to match any version, e.g. '1.10.*'." ))
+    version: #(( param "Version of the product to install. Use an asterisk to match any version, e.g. '1.10.*'." ))
     # The basename of the metadata file for the product without the file extension.
     # This will be used for figuring out which stemcell the product needs.
     #
@@ -40,7 +40,7 @@ meta:
     #
     # This can be found in the .pivotal file with the following:
     # `unzip -l p-rabbitmq-1.7.9.pivotal | grep metadata`
-    metadata_basename: (( param "Product metadata basename" ))
+    metadata_basename: #(( param "Product metadata basename" ))
     # om-linux
     # ------------------------------
     # The name of the product on Pivotal Network. This is used to configure the
@@ -49,14 +49,14 @@ meta:
     # This can be found in the URL of the product page, e.g. for rabbitmq the URL
     # is https://network.pivotal.io/products/pivotal-rabbitmq-service, and the
     # product slug is 'pivotal-rabbitmq-service'.
-    slug: (( param "Product slug in Pivotal network" ))
+    slug: #(( param "Product slug in Pivotal network" ))
     # The name of the product file found in the metadata file for the product. This
     # will be used for staging the file in Operations Manager.
     #
     # This can be found in the .pivotal file's manifest for the product. This can
     # be found in the .pivotal file with the following:
     # `unzip -p p-rabbitmq-1.7.8.pivotal "metadata/*.yml" | grep '^name'`
-    tile-name: (( param "Product name used in the .pivotal file" ))
+    tile-name: #(( param "Product name used in the .pivotal file" ))
 
 
 groups: []
@@ -120,18 +120,18 @@ jobs:
 - name: fetch-resources
   plan:
   - aggregate:
-      - get: pcf-pipelines
-      - get: pivnet-product
-        resource: (( grab meta.product.name ))
-        passed: [regulator]
-        trigger: true
-        params:
-          globs:
-          - "*pivotal"
-      - get: tool-om
-        params:
-          globs:
-          - om-linux
-      - get: stemcell-downloader
-        params:
-          globs: [stemcell-downloader-linux]
+    - get: pcf-pipelines
+    - get: pivnet-product
+      resource: (( grab meta.product.name ))
+      passed: [regulator]
+      trigger: true
+      params:
+        globs:
+        - "*pivotal"
+    - get: tool-om
+      params:
+        globs:
+        - om-linux
+    - get: stemcell-downloader
+      params:
+        globs: [stemcell-downloader-linux]
