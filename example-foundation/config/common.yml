@@ -1,0 +1,4 @@
+meta:
+  common:
+    pivnet:
+      poll-interval: 1h

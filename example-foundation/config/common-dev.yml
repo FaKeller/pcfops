@@ -1,8 +1,4 @@
 meta:
-  common:
-    pivnet:
-      poll-interval: 1h
-
   stage:
     opsman:
       uri: https://test-ops-manager.local
