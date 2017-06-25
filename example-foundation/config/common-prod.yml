@@ -1,0 +1,7 @@
+meta:
+  stage:
+    opsman:
+      uri: https://prod-ops-manager.local
+      admin-username: admin-prod
+      timeout-seconds: 600
+    iaas-type: vsphere
