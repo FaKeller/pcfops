@@ -41,7 +41,7 @@ PIPE=$(echo "${PIPE}" | spruce merge --skip-eval - ${PCFOPS_LOCATION}/pipelines/
 PREVIOUS_JOB="fetch-resources"
 
 for stage in $L_STAGES; do
-
+    echo "STAGE: ${stage}, PREVIOUS: ${PREVIOUS_JOB}"
     # 2. get base template for single stage
     PIPE=$(echo "${PIPE}" | spruce merge --skip-eval - ${PCFOPS_LOCATION}/pipelines/upgrade-tile/stage-template.yml)
 
@@ -51,10 +51,11 @@ for stage in $L_STAGES; do
 meta:
   stage:
     name: ${stage}
-    previous-job: ${PREVIOUS_JOB}
+    job-previous: ${PREVIOUS_JOB}
 EOF
     PIPE=$(echo "${PIPE}" | spruce merge --skip-eval - ${TMP_FILE})
     rm ${TMP_FILE}
+    PREVIOUS_JOB="upgrade-tile-"$stage
 
     # 4. merge pcfops product config
     PRODUCT_CONFIG="${PCFOPS_LOCATION}/products/${product}.yml"

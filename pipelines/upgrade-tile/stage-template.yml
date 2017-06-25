@@ -1,7 +1,9 @@
 meta:
   stage:
     name: #(( param "The name of the stage" ))
-    previous-job: #(( param "The names of the previous jobs required to be passed for this stage to run" ))
+    job-previous: #(( param "The names of the previous jobs required to be passed for this stage to run" ))
+    job-prefix: "upgrade-tile-"
+    job-name: (( concat meta.stage.job-prefix meta.stage.name ))
 
     # Credentials for Operations Manager. These are used for uploading, staging,
     # and deploying the product file on Operations Manager.
@@ -19,18 +21,18 @@ meta:
 
 jobs:
 - (( append ))
-- name: (( concat "upgrade-tile-" meta.stage.name ))
+- name: (( grab meta.stage.job-name ))
   plan:
   - aggregate:
     - get: pivnet-product
       resource: (( grab meta.product.name ))
-      passed: [ (( grab meta.stage.previous-job )) ]
+      passed: [ (( grab meta.stage.job-previous )) ]
     - get: pcf-pipelines
-      passed: [ (( grab meta.stage.previous-job )) ]
+      passed: [ (( grab meta.stage.job-previous )) ]
     - get: tool-om
-      passed: [ (( grab meta.stage.previous-job )) ]
+      passed: [ (( grab meta.stage.job-previous )) ]
     - get: stemcell-downloader
-      passed: [ (( grab meta.stage.previous-job )) ]
+      passed: [ (( grab meta.stage.job-previous )) ]
   - task: wait-opsman-clear
     file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
     params:
